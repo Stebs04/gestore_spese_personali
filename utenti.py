@@ -81,3 +81,43 @@ def login_utente():
     else:
         print("Utente non trovato.")
         return None
+    
+def recupera_password():
+    database_utenti = _carica_utenti()
+    
+    print("\n--- Recupero Password ---")
+    email = input("Inserisci la tua email di registrazione: ")
+    
+    # 1. Controlliamo se la mail esiste
+    if email in database_utenti:
+        profilo = database_utenti[email]
+        
+        # 2. Chiediamo il token segreto
+        token_input = input("Inserisci il tuo token segreto: ")
+        
+        # 3. Controlliamo se il token corrisponde a quello salvato
+        if token_input == profilo['token']:
+            print("Token corretto! Puoi reimpostare la password.")
+            
+            # 4. Facciamo inserire la nuova password (stesso ciclo di controllo della registrazione)
+            while True:
+                nuova_pwd = input("Inserisci la nuova password (min 8 caratteri): ")
+                if len(nuova_pwd) < 8:
+                    print("Password troppo corta! Riprova.")
+                else:
+                    break
+            
+            # 5. Aggiorniamo la password nel dizionario e salviamo
+            profilo['pwd'] = nuova_pwd
+            database_utenti[email] = profilo # Aggiorniamo il profilo dell'utente
+            _salva_utenti(database_utenti)
+            
+            print("Password aggiornata con successo! Ora puoi accedere.")
+            return True
+            
+        else:
+            print("Token errato! Impossibile recuperare la password.")
+            return False
+    else:
+        print("Email non trovata nel sistema.")
+        return False
