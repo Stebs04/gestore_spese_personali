@@ -1,57 +1,64 @@
-# 💰 Gestore Spese Personali (Multi-Utente)
+# 💰 Gestore Spese Personali (Secure & Organized)
 
-Un'applicazione CLI (Command Line Interface) scritta in Python per gestire le proprie spese quotidiane.
-Partito come un semplice esercizio di logica, il progetto si è evoluto nella **Versione 1.1** diventando un gestionale **multi-utente** con sistema di autenticazione e salvataggio dati separato.
+Un'applicazione CLI (Command Line Interface) scritta in Python per gestire le proprie spese quotidiane in modo sicuro e organizzato.
+Il progetto si è evoluto alla **Versione 1.2**, introducendo crittografia delle password, recupero credenziali e una gestione avanzata dei file in sottocartelle.
 
-## 🚀 Novità della Versione 1.1
+## 🚀 Novità della Versione 1.2
 
-* 🔐 **Sistema di Login e Registrazione:** Accesso sicuro tramite email e password.
-* 👥 **Supporto Multi-Utente:** Più persone possono usare il programma sullo stesso PC; ognuno vedrà *solo* le proprie spese.
-* 💾 **Database Dinamici:** Il programma genera automaticamente un file JSON separato per ogni utente registrato (es. `nome_cognome.json`).
-* 🛡️ **Controlli di Sicurezza:** Validazione della lunghezza password in fase di registrazione.
+* 🔒 **Sicurezza Avanzata:** Le password non vengono più salvate in chiaro, ma criptate usando l'algoritmo **SHA-256**.
+* 📂 **File System Ordinato:** Il programma crea e gestisce automaticamente le sottocartelle:
+    * `utenti/`: contiene il database crittografato degli utenti.
+    * `spese/`: contiene i file JSON personali di ogni singolo utente.
+* 🆘 **Recupero Password:** Hai dimenticato la password? Puoi reimpostarla usando il tuo **Token Segreto** salvato in fase di registrazione.
+* 🏷️ **Categorie:** Selezione guidata della categoria di spesa (Cibo, Trasporti, Svago, ecc.).
 
 ## ✨ Funzionalità Principali
 
-* **Aggiungi Spesa:** Inserisci importo, descrizione e data.
-* **Visualizza Spese:** Guarda il tuo estratto conto personale.
-* **Calcola Totale:** Somma automatica di tutte le tue spese.
-* **Ricerca Avanzata:** Trova le spese effettuate in una data specifica.
-* **Elimina Spesa:** Rimuovi una voce errata o non necessaria.
-* **Persistenza Dati:** Tutto viene salvato automaticamente su file JSON.
+* **Login Multi-Utente:** Accesso separato per ogni persona.
+* **Privacy Totale:** Ogni utente vede solo il proprio file delle spese.
+* **Gestione Completa:** Aggiungi, visualizza, cerca ed elimina le spese.
+* **Calcoli Automatici:** Ottieni il totale delle tue uscite in un istante.
+* **Resilienza:** I dati vengono salvati automaticamente su disco.
 
 ## 🛠️ Requisiti
 
 * Python 3.x installato.
-* Nessuna libreria esterna richiesta (usa solo librerie standard: `json`, `re`).
+* Librerie standard utilizzate: `json`, `re`, `os`, `hashlib`.
 
 ## ▶️ Come usare il programma
 
 1.  Scarica la cartella del progetto.
-2.  Apri il terminale nella cartella.
+2.  Apri il terminale nella cartella principale.
 3.  Esegui il comando:
     ```bash
     python main.py
     ```
-4.  **Al primo avvio:** Scegli l'opzione **2) Registrati** per creare il tuo utente.
-5.  Effettua il **Login** con le credenziali appena create.
-6.  Gestisci le tue spese dal menu principale!
+4.  **Al primo avvio:** Il programma creerà automaticamente le cartelle `spese` e `utenti`.
+5.  Registrati inserendo Email, Password (min 8 caratteri) e un Token di recupero.
+6.  Accedi e inizia a tracciare le tue spese!
 
-## 📂 Struttura del Progetto
-
-* `main.py`: Il punto di ingresso. Gestisce il flusso Login -> Menu Spese.
-* `utenti.py`: Gestisce la logica di registrazione, login e sicurezza credenziali.
-* `logica.py`: Contiene le funzioni "core" (creazione, calcoli, ricerca spese).
-* `gestione_files.py`: Modulo flessibile per leggere/scrivere su diversi file JSON.
-* `utenti.json`: Database crittografato (in futuro) contenente le credenziali degli utenti.
-* `*_*.json`: File generati automaticamente che contengono le spese dei singoli utenti.
-
+    ## 📂 Struttura del Progetto
+    
+    ```text
+    gestore_spese/
+    │
+    ├── main.py            # Entry point: Gestisce login e creazione cartelle
+    ├── utenti.py          # Logica di autenticazione, hashing e recupero pwd
+    ├── logica.py          # Funzioni core (CRUD spese e categorie)
+    ├── gestione_files.py  # Driver per lettura/scrittura JSON
+    │
+    ├── utenti/            # Cartella database utenti
+    │   └── utenti.json    # File con credenziali (Password hashate)
+    │
+    └── spese/             # Cartella database spese
+        ├── nome_cognome.json
+        └── altro_utente.json
 ## 🔮 Sviluppi Futuri
-
-* [ ] Aggiunta di Categorie per le spese (Cibo, Trasporti, Svago).
-* [ ] Hashing della password (per non salvarla in chiaro nel JSON).
-* [ ] Esportazione in CSV/Excel.
-* [ ] Funzione "Recupera Password" tramite Token.
-
+    
+* [ ] Esportazione report in Excel/CSV.
+* [ ] Grafici delle spese (es. torta per categorie).
+* [ ] Budget mensile con avvisi di superamento soglia.
+    
 ## ✍️ Autore
-
-**Stefano Bellan** - Progetto Portfolio Python
+    
+**Stefano Bellan**
