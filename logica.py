@@ -11,7 +11,6 @@ def crea_spesa():
             break
         else:
             print("Categoria non valida riprova da capo!!!!")
-            exit()
     descrizione = input("Inserisci una descrizione della spesa o la tipologia: ")
     data = input("Inserisci la data in cui è stata fatta\n (Usa questo formato GG/MM/YY): ")
     spesa["importo"] = importo

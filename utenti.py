@@ -2,6 +2,7 @@ import json
 import re
 import gestione_files
 import os
+import hashlib
 
 FILE_UTENTI = os.path.join("utenti", "utenti.json")
 
@@ -36,6 +37,7 @@ def registra_utente():
         if len(pwd) < 8:
             print("Password troppo corta! Riprova.")
         else:
+            hashed_pwd = hashlib.sha256(pwd.encode()).hexdigest()
             break 
     
     token = input("Inserisci token per recupero password: ")
@@ -43,7 +45,7 @@ def registra_utente():
     # 3. CREIAMO IL PROFILO
     nuovo_profilo = {
         "anagrafica": anagrafica,
-        "pwd": pwd,
+        "pwd": hashed_pwd,
         "token": token
     }
     
@@ -68,11 +70,12 @@ def login_utente():
     
     email_l = input("Inserisci email: ")
     pwd_l = input("Inserisci password: ")
+    hashed_pwd = hashlib.sha256(pwd_l.encode()).hexdigest()
     
     if email_l in database_utenti:
         profilo_utente = database_utenti[email_l]
         
-        if pwd_l == profilo_utente['pwd']:
+        if hashed_pwd == profilo_utente['pwd']:
             print(f"Benvenuto {profilo_utente['anagrafica']}!")
             return email_l 
         else:
@@ -105,10 +108,11 @@ def recupera_password():
                 if len(nuova_pwd) < 8:
                     print("Password troppo corta! Riprova.")
                 else:
+                    hashed_pwd = hashlib.sha256(nuova_pwd.encode()).hexdigest()
                     break
             
             # 5. Aggiorniamo la password nel dizionario e salviamo
-            profilo['pwd'] = nuova_pwd
+            profilo['pwd'] = hashed_pwd
             database_utenti[email] = profilo # Aggiorniamo il profilo dell'utente
             _salva_utenti(database_utenti)
             
