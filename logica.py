@@ -56,3 +56,4 @@ def ricerca_spesa(lista_spese):
             trovato = True
         elif not trovato:
             print("Nessuna spesa trovata con questa data")
+
