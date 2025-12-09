@@ -1,8 +1,9 @@
 import json
 import re
 import gestione_files
+import os
 
-FILE_UTENTI = "utenti.json"
+FILE_UTENTI = os.path.join("utenti", "utenti.json")
 
 def _carica_utenti():
     try:
@@ -57,7 +58,8 @@ def registra_utente():
     # 6. CREIAMO IL FILE SPESE PERSONALE (Vuoto)
     # Qui usiamo re.sub ma SENZA cartelle, file salvato nella root
     nome_base = re.sub(r'[@.]', '_', email) + ".json"
-    gestione_files.salva_dati([], nome_base)
+    percorso_spese = os.path.join("spese", nome_base)
+    gestione_files.salva_dati([], percorso_spese)
 
     return email
 

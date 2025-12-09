@@ -2,7 +2,14 @@ import logica
 import gestione_files
 import utenti
 import re 
+import os 
 
+#--- FASE 0: SETUP INIZIALE ---
+if not os.path.exists("spese"):
+    os.makedirs("spese")
+if not os.path.exists("utenti"):
+    os.makedirs("utenti")
+    
 # Variabile per ricordarci chi è loggato
 utente_corrente_email = None
 
