@@ -65,25 +65,21 @@ def registra_utente():
 
     return email
 
-def login_utente():
+def login_utente(email, password): 
     database_utenti = _carica_utenti()
     
-    email_l = input("Inserisci email: ")
-    pwd_l = input("Inserisci password: ")
-    hashed_pwd = hashlib.sha256(pwd_l.encode()).hexdigest()
+    # Hashiamo la password
+    hashed_pwd = hashlib.sha256(password.encode()).hexdigest()
     
-    if email_l in database_utenti:
-        profilo_utente = database_utenti[email_l]
+    if email in database_utenti:
+        profilo_utente = database_utenti[email]
         
         if hashed_pwd == profilo_utente['pwd']:
-            print(f"Benvenuto {profilo_utente['anagrafica']}!")
-            return email_l 
+            return email  # Successo
         else:
-            print("Password errata.")
-            return None
+            return None   # Password errata
     else:
-        print("Utente non trovato.")
-        return None
+        return None       # Utente non trovato
     
 def recupera_password():
     database_utenti = _carica_utenti()

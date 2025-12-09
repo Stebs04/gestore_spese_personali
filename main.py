@@ -22,9 +22,17 @@ while True:
     scelta = input("Scelta: ")
 
     if scelta == "1":
-        utente_corrente_email = utenti.login_utente()
+        email_input = input("Inserisci email: ")
+        pwd_input = input("Inserisci password: ")
+        
+        # Passiamo i dati raccolti alla funzione logica
+        utente_corrente_email = utenti.login_utente(email_input, pwd_input)
+        
         if utente_corrente_email: 
+            print("Login effettuato con successo!")
             break 
+        else:
+            print("Login fallito: Email o Password errati.")
             
     elif scelta == "2":
         nuovo_utente = utenti.registra_utente()
