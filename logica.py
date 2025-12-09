@@ -3,6 +3,15 @@
 def crea_spesa():
     spesa = {}
     importo = float(input("Inserisci l'importo della spesa: "))
+    while True: 
+        categoria = input("Seleziona tra le categorie presenti\n1)Casa e bollette\n2)Trasporti\n3)Alimentari\n" \
+        "4)Svago e ristoranti\n5)Salute\n6)Shopping\n7)Altro\nScrivi la categoria: ")
+        if categoria in ["1", "2", "3", "4", "5", "6", "7"]:
+            spesa["categoria"] = categoria
+            break
+        else:
+            print("Categoria non valida riprova da capo!!!!")
+            exit()
     descrizione = input("Inserisci una descrizione della spesa o la tipologia: ")
     data = input("Inserisci la data in cui è stata fatta\n (Usa questo formato GG/MM/YY): ")
     spesa["importo"] = importo
@@ -18,7 +27,7 @@ def stampa_spesa(lista_spese):
         print("Non ci sono spese registrate!!!\n")
     else:
         for spesa in lista_spese:
-            print(f"{spesa['data']} -> {spesa['descrizione']}: {spesa['importo']}€")
+            print(f"{spesa['data']} -> {spesa['categoria']} -> {spesa['descrizione']}: {spesa['importo']}€")
             print("-------------------")
 
 #Funzione che calcola la somma di tutte le spese inserite nel file JSON

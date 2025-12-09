@@ -41,16 +41,27 @@ while True:
     else:
         print("Scelta non valida!")
 
-# --- FASE 2: PREPARAZIONE DATI ---
-# Ricostruiamo il nome del file (senza cartelle)
-nome_file_spese = re.sub(r'[@.]', '_', utente_corrente_email) + ".json"
+# --- FASE 2: PREPARAZIONE DATI (CORREZIONE QUI!) ---
+# 1. Ricostruiamo il nome del file grezzo
+nome_file_grezzo = re.sub(r'[@.]', '_', utente_corrente_email) + ".json"
 
-# Carichiamo le spese
+# 2. Costruiamo il percorso COMPLETO: cartella "spese" + nome file
+# Questo era il pezzo mancante!
+nome_file_spese = os.path.join("spese", nome_file_grezzo)
+
+# 3. Carichiamo le spese
 spese = gestione_files.carica_dati(nome_file_spese)
 
 # --- FASE 3: GESTORE SPESE ---
+# (Il resto del codice va bene, usa già la variabile nome_file_spese che abbiamo corretto sopra)
 while True:
     print(f"\n--Gestore Spese di {utente_corrente_email}--")
+    # ... resto del tuo codice ...
+    # Ricorda solo di assicurarti che le chiamate a salva_dati usino nome_file_spese
+    # Esempio: gestione_files.salva_dati(spese, nome_file_spese)
+    
+    # ... copia pure il resto del tuo while loop precedente ...
+    # Ti rimetto qui solo l'inizio per chiarezza
     print("1) Aggiungi spesa")
     print("2) Visualizza spese")
     print("3) Calcolo totale spese")
@@ -63,6 +74,7 @@ while True:
     try: 
         if user_input == '1':
             print("Hai scelto di aggiungere una spesa!!!\n")
+            # Nota: Ho visto che hai aggiornato logica.py con le categorie, ottimo!
             nuova_spesa = logica.crea_spesa()
             spese.append(nuova_spesa)
             gestione_files.salva_dati(spese, nome_file_spese)
