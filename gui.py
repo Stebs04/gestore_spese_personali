@@ -1,4 +1,5 @@
 import flet as ft
+import utenti
 
 def login(page: ft.Page):
     #1. SETUP Pagina
@@ -61,13 +62,34 @@ def login(page: ft.Page):
         prefix_icon=ft.Icons.MAIL_OUTLINE #icona per la UIX
     )
 
+    def login_function(e):
+        email = email_field.value #Recupero l'email
+        pwd = pwd_field.value #Recupero la password
+        nuovo_utente = utenti.login_utente(email, pwd)
+        if nuovo_utente:
+            page.open(
+                ft.SnackBar(
+                    content=ft.Text("Login Effettuato con successo"),
+                    bgcolor="green"
+                )
+            )
+        else:
+            page.open(
+                ft.SnackBar(
+                content=ft.Text("Credenziali non valide!!!"),
+                bgcolor="red"
+                )
+            )
+
+
     #Bottone per l'accesso
     submit_button = ft.ElevatedButton(
             text="Invia",
             bgcolor=ft.Colors.BLUE_ACCENT_700,
             color=ft.Colors.WHITE,
             width=375 - 40, # Per adattarsi al padding della pagina
-            height=50
+            height=50,
+            on_click=login_function
             
         )
     
