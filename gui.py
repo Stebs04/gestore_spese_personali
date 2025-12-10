@@ -3,6 +3,7 @@ import utenti
 import logica
 import re
 import os
+import gestione_files
 
 def main(page: ft.Page):
     #1. SETUP Pagina
@@ -152,12 +153,23 @@ def main(page: ft.Page):
         )
 
         #Barra icone in basso
+        def on_navigation_change(e):
+            if e.control.selected_index == 0:
+                view_dasboard(nome_utente)
+            elif e.control.selected_index == 1:
+                pass  # Profilo - implementare in seguito
+            elif e.control.selected_index == 2:
+                pass  # Impostazioni - implementare in seguito
+
         page.navigation_bar = ft.NavigationBar(
-            bgcolor="#1f1f1f", #Grigio Scuro
-            indicator_color="blue", #Colore selezione
-            destinations=[ft.NavigationBarDestination(icon="home", label="Home"),
-                        ft.NavigationBarDestination(icon="person", label="Profilo"),
-                        ft.NavigationBarDestination(icon="setting", label="Impostazioni")]
+            bgcolor="#1f1f1f",
+            indicator_color="blue",
+            on_change=on_navigation_change,
+            destinations=[
+            ft.NavigationBarDestination(icon="home", label="Home"),
+            ft.NavigationBarDestination(icon="person", label="Profilo"),
+            ft.NavigationBarDestination(icon="setting", label="Impostazioni")
+            ]
         )
 
         #CREAZIONE DEI BOTTONI (La lista intelligente)
@@ -181,6 +193,8 @@ def main(page: ft.Page):
                 funzione_click = lambda e: view_aggiungi_spesa(nome_utente)
             elif titolo == "Esci":
                 funzione_click = lambda e: view_login()
+            elif titolo == "Visualizza":
+                funzione_click = lambda e: view_spese(nome_utente)
             else:
                 funzione_click = lambda e: print(f"Cliccato {e.control.content.controls[1].value}")
 
@@ -381,5 +395,85 @@ def main(page: ft.Page):
 
         page.add(viewbox)
 
+    def view_spese(nome_utente):
+        page.clean()
+        
+        # Titolo (Grafica invariata)
+        txt_spese = ft.Text(
+            value="Spesa",
+            size=15,
+            color=ft.Colors.WHITE
+        )
+
+        # 1. Caricamento Dati
+        nome_base = re.sub(r'[@.]', '_', nome_utente) + ".json"
+        percorso_spese = os.path.join("spese", nome_base)
+        lista_spese = gestione_files.carica_dati(percorso_spese)
+        
+        lista_spese_grafica = []
+        
+        # 2. Ciclo corretto: iteriamo su ogni dizionario 'spesa' nella lista
+        for spesa_dict in lista_spese:
+            # Recuperiamo i dati direttamente usando le chiavi
+            # Nota: uso .get() per evitare crash se manca un campo
+            categoria = spesa_dict.get("categoria", "")
+            descrizione = spesa_dict.get("descrizione", "")
+            importo = spesa_dict.get("importo", "0")
+
+            # Creazione oggetti grafici per i testi
+            desc = ft.Text(value=descrizione, size=15, color="white")
+            imp = ft.Text(value=f"{importo} €", size=15, color="white")
+
+            # Logica Icone (invariata ma resa robusta)
+            icona = ft.Icon(name=ft.Icons.MORE_HORIZ, size=20, color="white") # Default
+            
+            if categoria == "Casa e bollette":
+                icona = ft.Icon(name=ft.Icons.HOME, size=20, color="white")
+            elif categoria == "Trasporti":
+                icona = ft.Icon(name=ft.Icons.FLIGHT, size=20, color="white")
+            elif categoria == "Alimentari":
+                icona = ft.Icon(name=ft.Icons.APPLE, size=20, color="white")
+            elif categoria == "Svago" or categoria == "Svago e ristoranti":
+                icona = ft.Icon(name=ft.Icons.SHOPPING_BAG, size=20, color="white")
+            elif categoria == "Salute":
+                icona = ft.Icon(name=ft.Icons.HEALING, size=20, color="white")
+            elif categoria == "Shopping":
+                icona = ft.Icon(name=ft.Icons.SHOPPING_CART, size=20, color="white")
+
+            # Creazione Riga
+            # LOGICA FIX: In una Row, per staccare gli elementi serve width, non height.
+            riga_spesa = ft.Row(
+                controls=[
+                    icona, 
+                    ft.Container(width=20), # Corretto height -> width per spaziare orizzontalmente
+                    desc, 
+                    ft.Container(width=20), # Corretto height -> width
+                    imp
+                ],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
+            lista_spese_grafica.append(riga_spesa)
+
+        # 3. Creazione del Box FINALE (fuori dal ciclo)
+        # LOGICA FIX: Usiamo l'operatore * per scompattare la lista dentro i controls
+        # oppure concateniamo le liste. La tua versione inseriva una lista dentro una lista (errore).
+        contenuto_colonna = [txt_spese, ft.Container(height=20)] + lista_spese_grafica
+
+        viewbox = ft.Container(
+            content=ft.Column(
+                controls=contenuto_colonna,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            ),
+            # STILE DEL BOX (Esattamente come il tuo)
+            border=ft.border.all(color=ft.Colors.WHITE54, width=2), 
+            border_radius=20, 
+            padding=20,       
+            margin=10,        
+            bgcolor="#1f1f1f" 
+        )
+        
+        page.add(viewbox)
+        page.update()
+            
     view_login()
 ft.app(target=main, assets_dir="assets")

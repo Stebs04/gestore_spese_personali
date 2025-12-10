@@ -71,7 +71,7 @@ def ricerca_spesa(lista_spese):
 def crea_spesa_gui(importo, categoria, descrizione, data, nome_utente):
     spesa = {}
     spesa["importo"] = importo
-    spesa["categoaira"] = categoria
+    spesa["categoria"] = categoria
     spesa["descrizione"] = descrizione
     spesa["data"] = data
     nome_base = re.sub(r'[@.]', '_', nome_utente) + ".json"
