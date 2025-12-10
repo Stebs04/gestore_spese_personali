@@ -1,3 +1,6 @@
+import gestione_files
+import re
+import os
 
 #Creo la funzione per aggiungere una spesa
 def crea_spesa():
@@ -65,3 +68,22 @@ def ricerca_spesa(lista_spese):
         elif not trovato:
             print("Nessuna spesa trovata con questa data")
 
+def crea_spesa_gui(importo, categoria, descrizione, data, nome_utente):
+    spesa = {}
+    spesa["importo"] = importo
+    spesa["categoaira"] = categoria
+    spesa["descrizione"] = descrizione
+    spesa["data"] = data
+    nome_base = re.sub(r'[@.]', '_', nome_utente) + ".json"
+    percorso_spese = os.path.join("spese", nome_base)
+    lista_spese = gestione_files.carica_dati(percorso_spese)
+    if isinstance(lista_spese, dict):
+        if lista_spese:
+            lista_spese = [lista_spese]
+        else:
+            lista_spese = []
+    elif not isinstance(lista_spese, list):
+        lista_spese=[]
+    lista_spese.append(spesa)
+    gestione_files.salva_dati(lista_spese, percorso_spese)
+    return True

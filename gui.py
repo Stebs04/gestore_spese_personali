@@ -1,5 +1,8 @@
 import flet as ft
 import utenti
+import logica
+import re
+import os
 
 def main(page: ft.Page):
     #1. SETUP Pagina
@@ -9,6 +12,7 @@ def main(page: ft.Page):
     page.window.width = 375
     page.window.height = 812
     page.window.resizable = False # Blocchiamo il ridimensionamento
+
 
 #creazione pagina login
     def view_login(): 
@@ -61,7 +65,7 @@ def main(page: ft.Page):
             hint_style=ft.TextStyle(color="grey"),
             border_radius=12, #Arrotonda gli angoli
             border_color=ft.Colors.GREY_300,
-            prefix_icon=ft.Icons.MAIL_OUTLINE #icona per la UIX
+            prefix_icon=ft.Icons.LOCK_OUTLINE #icona per la UIX
         )
 
         def login_function(e):
@@ -170,13 +174,23 @@ def main(page: ft.Page):
         lista_bottoni_grafici = []
 
         for titolo, icona in menu_items:
+            #creo la funzione di click personalizzata
+            funzione_click = None
+
+            if titolo == "Aggiungi":
+                funzione_click = lambda e: view_aggiungi_spesa(nome_utente)
+            elif titolo == "Esci":
+                funzione_click = lambda e: view_login()
+            else:
+                funzione_click = lambda e: print(f"Cliccato {e.control.content.controls[1].value}")
+
             # Creiamo il quadrato per ogni voce
             btn = ft.Container(
                 bgcolor="#1f1f1f", # Grigio scuro moderno
                 border=ft.border.all(1, "white"), # Bordo sottile
                 border_radius=20, # Angoli tondi
                 ink=True,         # Effetto click
-                on_click=lambda e: print(f"Cliccato!"), # Placeholder logica
+                on_click=funzione_click, 
                 padding=10,
                 # Cosa c'è dentro il quadrato? Icona + Testo
                 content=ft.Column(
@@ -221,6 +235,151 @@ def main(page: ft.Page):
         )
         
         page.update()
+
+    #Creazione della sezione aggiungi spesa
+    def view_aggiungi_spesa(nome_utente):
+        page.clean()
+
+        txt_spese = ft.Text(
+            value="Aggiungi una spesa",
+            size=15,
+            color=ft.Colors.WHITE
+        )
+
+        ammount_field = ft.TextField(
+            label="Importo",
+            hint_text="0.00",
+            suffix_text="€",
+            #Abilito lo sfondo interno
+            keyboard_type=ft.KeyboardType.NUMBER,
+            filled=True,
+            bgcolor="#212121",
+            #Colori quando c'è il focus su esso
+            focused_bgcolor="#212121",
+            focused_border_color="blue",
+            cursor_color="blue",
+            #Stili del testo
+            text_style=ft.TextStyle(color="white"),
+            hint_style=ft.TextStyle(color="grey"),
+            border_radius=12, #Arrotonda gli angoli
+            border_color=ft.Colors.GREY_300,
+            prefix_icon=ft.Icons.ATTACH_MONEY #icona per la UIX
+        )
+
+            # Campo Categoria
+        dd_categoria = ft.Dropdown(
+            label="Categoria",
+            hint_text="Seleziona categoria",
+            # --- Stile ---
+            filled=True,
+            bgcolor="#212121",
+            border_radius=12,
+            border_color=ft.Colors.GREY_300,
+            text_style=ft.TextStyle(color="white"),
+            expand=True,  # Occupa tutta la larghezza disponibile
+            # --- Opzioni ---
+            options=[
+            ft.dropdown.Option("Casa e bollette"),
+            ft.dropdown.Option("Trasporti"),
+            ft.dropdown.Option("Alimentari"),
+            ft.dropdown.Option("Svago"),
+            ft.dropdown.Option("Salute"),
+            ft.dropdown.Option("Shopping"),
+            ft.dropdown.Option("Altro"),
+            ]
+        )
+
+        txt_descrizione = ft.TextField(
+            label="Descrizione",
+            hint_text="Inserisci descrizione",
+            filled=True,
+            bgcolor="#212121",
+            #Colori quando c'è il focus su esso
+            focused_bgcolor="#212121",
+            focused_border_color="blue",
+            cursor_color="blue",
+            #Stili del testo
+            text_style=ft.TextStyle(color="white"),
+            hint_style=ft.TextStyle(color="grey"),
+             #Arrotonda gli angoli
+            border_color=ft.Colors.GREY_300,
+            prefix_icon=ft.Icons.EDIT #icona per la UIX
+        )
+
+        txt_data = ft.TextField(
+            label="Data",
+            hint_text="Inserisci una data",
+            filled=True,
+            bgcolor="#212121",
+            #Colori quando c'è il focus su esso
+            focused_bgcolor="#212121",
+            focused_border_color="blue",
+            cursor_color="blue",
+            #Stili del testo
+            text_style=ft.TextStyle(color="white"),
+            hint_style=ft.TextStyle(color="grey"),
+             #Arrotonda gli angoli
+            border_color=ft.Colors.GREY_300,
+            prefix_icon=ft.Icons.CALENDAR_TODAY #icona per la UIX
+        )
+        
+        def aggiunta_spesa(e):
+            risultato = logica.crea_spesa_gui(ammount_field.value, dd_categoria.value, txt_descrizione.value, txt_data.value, nome_utente)
+            if(risultato):
+                page.open(
+                    ft.SnackBar(
+                        content=ft.Text("Spesa Aggiunta con Successo"),
+                        bgcolor="green"
+                    )
+                )
+                view_dasboard(nome_utente)
+            else:
+                page.open(
+                    ft.SnackBar(
+                        content=ft.Text("Impossibile Aggiungere spesa!!!"),
+                        bgcolor="red"
+                    )
+                )
+                view_dasboard(nome_utente)
+
+
+        submit_button = ft.ElevatedButton(
+                text="Invia",
+                bgcolor=ft.Colors.BLUE_ACCENT_700,
+                color=ft.Colors.WHITE,
+                width=375 - 40, # Per adattarsi al padding della pagina
+                height=50,
+                on_click=aggiunta_spesa
+                
+        )
+
+        viewbox = ft.Container(
+            content=ft.Column(
+            controls=[
+                ft.Container(height=50),  # Spazio aggiuntivo in alto
+                txt_spese, 
+                ft.Container(height=20), 
+                ammount_field, 
+                ft.Container(height=20), 
+                dd_categoria, 
+                ft.Container(height=20),
+                txt_descrizione, 
+                ft.Container(height=20), 
+                txt_data, 
+                ft.Container(height=20), 
+                submit_button
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER # Centra gli elementi nel box
+            ),
+            # STILE DEL BOX
+            border=ft.border.all(color=ft.Colors.WHITE54, width=2), # Outline biancastra (54 è un po' trasparente)
+            border_radius=20, # "Squadratura" arrotondata (metti 0 se vuoi angoli vivi)
+            padding=20,       # Spazio interno tra il bordo e i campi
+            margin=10,        # Spazio esterno
+            bgcolor="#1f1f1f" # Opzionale: sfondo del box uguale alla barra
+        )
+
+        page.add(viewbox)
 
     view_login()
 ft.app(target=main, assets_dir="assets")
