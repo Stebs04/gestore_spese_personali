@@ -499,9 +499,9 @@ def main(page: ft.Page):
             #Stili del testo
             text_style=ft.TextStyle(color="white"),
             hint_style=ft.TextStyle(color="grey"),
-            border_radius=12, #Arrotonda gli angoli
+             #Arrotonda gli angoli
             border_color=ft.Colors.GREY_300,
-            prefix_icon=ft.Icons.ATTACH_MONEY #icona per la UIX
+            prefix_icon=ft.Icons.CALENDAR_TODAY #icona per la UIX
         )
 
             # Campo Categoria
