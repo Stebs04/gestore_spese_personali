@@ -195,6 +195,8 @@ def main(page: ft.Page):
                 funzione_click = lambda e: view_login()
             elif titolo == "Visualizza":
                 funzione_click = lambda e: view_spese(nome_utente)
+            elif titolo == "Cerca":
+                funzione_click = lambda e: view_ricerca(nome_utente)
             else:
                 funzione_click = lambda e: print(f"Cliccato {e.control.content.controls[1].value}")
 
@@ -474,6 +476,160 @@ def main(page: ft.Page):
         
         page.add(viewbox)
         page.update()
+    def view_ricerca(nome_utente):
+        page.clean()
+
+        txt_spese = ft.Text(
+            value="Ricerca una spesa",
+            size=15,
+            color=ft.Colors.WHITE
+        )
+
+        data_field = ft.TextField(
+            label="Data",
+            hint_text="Inserisci una data da ricercare",
+            #Abilito lo sfondo interno
+            keyboard_type=ft.KeyboardType.NUMBER,
+            filled=True,
+            bgcolor="#212121",
+            #Colori quando c'è il focus su esso
+            focused_bgcolor="#212121",
+            focused_border_color="blue",
+            cursor_color="blue",
+            #Stili del testo
+            text_style=ft.TextStyle(color="white"),
+            hint_style=ft.TextStyle(color="grey"),
+            border_radius=12, #Arrotonda gli angoli
+            border_color=ft.Colors.GREY_300,
+            prefix_icon=ft.Icons.ATTACH_MONEY #icona per la UIX
+        )
+
+            # Campo Categoria
+        dd_categoria = ft.Dropdown(
+            label="Categoria",
+            hint_text="Seleziona categoria",
+            # --- Stile ---
+            filled=True,
+            bgcolor="#212121",
+            border_radius=12,
+            border_color=ft.Colors.GREY_300,
+            text_style=ft.TextStyle(color="white"),
+            expand=True,  # Occupa tutta la larghezza disponibile
+            # --- Opzioni ---
+            options=[
+            ft.dropdown.Option("Casa e bollette"),
+            ft.dropdown.Option("Trasporti"),
+            ft.dropdown.Option("Alimentari"),
+            ft.dropdown.Option("Svago"),
+            ft.dropdown.Option("Salute"),
+            ft.dropdown.Option("Shopping"),
+            ft.dropdown.Option("Altro"),
+            ]
+        )
+        
+        def ricerca(e):
+            ricerca_spese_grafico = []
+            nome_base = re.sub(r'[@.]', '_', nome_utente) + ".json"
+            percorso_spese = os.path.join("spese", nome_base)
+            lista_spese = gestione_files.carica_dati(percorso_spese)
+            trovato = False
             
+            for spesa in lista_spese:
+                if spesa['data'] == data_field.value and spesa['categoria'] == dd_categoria.value:
+                    trovato = True
+                    categoria = spesa.get("categoria", "")
+                    importo = spesa.get("importo", "")
+                    data = spesa.get("data", "")
+                    # Creazione oggetti grafici per i testi
+                    data_g = ft.Text(value=data, size=15, color="white")
+                    imp = ft.Text(value=f"{importo} €", size=15, color="white")
+
+                    # Logica Icone (invariata ma resa robusta)
+                    icona = ft.Icon(name=ft.Icons.MORE_HORIZ, size=20, color="white") # Default
+                    
+                    if categoria == "Casa e bollette":
+                        icona = ft.Icon(name=ft.Icons.HOME, size=20, color="white")
+                    elif categoria == "Trasporti":
+                        icona = ft.Icon(name=ft.Icons.FLIGHT, size=20, color="white")
+                    elif categoria == "Alimentari":
+                        icona = ft.Icon(name=ft.Icons.APPLE, size=20, color="white")
+                    elif categoria == "Svago" or categoria == "Svago e ristoranti":
+                        icona = ft.Icon(name=ft.Icons.SHOPPING_BAG, size=20, color="white")
+                    elif categoria == "Salute":
+                        icona = ft.Icon(name=ft.Icons.HEALING, size=20, color="white")
+                    elif categoria == "Shopping":
+                        icona = ft.Icon(name=ft.Icons.SHOPPING_CART, size=20, color="white")
+
+                    # Creazione Riga
+                    riga_spesa = ft.Row(
+                        controls=[
+                            icona, 
+                            ft.Container(width=20),
+                            data_g, 
+                            ft.Container(width=20),
+                            imp
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER
+                    )
+                    ricerca_spese_grafico.append(riga_spesa)
+            
+            if not trovato:
+                page.open(
+                    ft.SnackBar(
+                        content=ft.Text("Nessuna ricerca soddisfa i tuoi requisiti!!", size=15, color="red")
+                    )
+                )
+            else:
+                contenuto_colonna = [txt_spese, ft.Container(height=20)] + ricerca_spese_grafico
+                risultato_box = ft.Container(
+                    content=ft.Column(
+                        controls=contenuto_colonna,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    ),
+                    border=ft.border.all(color=ft.Colors.WHITE54, width=2),
+                    border_radius=20,
+                    padding=20,
+                    margin=10,
+                    bgcolor="#1f1f1f"
+                )
+                page.clean()
+                page.add(risultato_box)
+                page.update()
+
+        submit_button = ft.ElevatedButton(
+                text="Invia",
+                bgcolor=ft.Colors.BLUE_ACCENT_700,
+                color=ft.Colors.WHITE,
+                width=375 - 40, # Per adattarsi al padding della pagina
+                height=50,
+                on_click=ricerca
+                
+        )
+
+        viewbox = ft.Container(
+            content=ft.Column(
+            controls=[
+                ft.Container(height=50),  # Spazio aggiuntivo in alto
+                txt_spese, 
+                ft.Container(height=20), 
+                data_field, 
+                ft.Container(height=20), 
+                dd_categoria, 
+                ft.Container(height=20),
+                submit_button
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER # Centra gli elementi nel box
+            ),
+            # STILE DEL BOX
+            border=ft.border.all(color=ft.Colors.WHITE54, width=2), # Outline biancastra (54 è un po' trasparente)
+            border_radius=20, # "Squadratura" arrotondata (metti 0 se vuoi angoli vivi)
+            padding=20,       # Spazio interno tra il bordo e i campi
+            margin=10,        # Spazio esterno
+            bgcolor="#1f1f1f" # Opzionale: sfondo del box uguale alla barra
+        )
+
+        page.add(viewbox)
+
+        
     view_login()
 ft.app(target=main, assets_dir="assets")
